@@ -1,0 +1,67 @@
+$breakpoints: (
+    'tiny'  : '(min-width: 320px)',
+    'small'  : '(min-width: 767px)',
+    'medium' : '(min-width: 992px)',
+    'large'  : '(min-width: 1200px)',
+    'complex': '(min-width: 767) and (max-width: 992px)',
+    'super-complex': 'screen and (orientation:landscape) and (min-device-width: 800px)'
+);
+
+@mixin respond-to($name, $push: false) {
+    // If the key exists in the map
+    @if map-has-key($breakpoints, $name) {
+        // Prints a media query based on the value
+        @media #{map-get($breakpoints, $name)} {
+            @content;
+        }
+    }
+
+        // If the key doesn't exist in the map
+        // But $push is defined
+    @else if $push != false {
+        // Add the new breakpoint to the map
+        $breakpoints: map-merge($breakpoints, ($name: $push)) !global;
+        // And re-call the mixin normally
+        @include respond-to($name) {
+            @content;
+        }
+    }
+
+        // If the key doesn't exist in the map
+        // And there is no push
+    @else {
+        // Just warn the user
+        @warn "Unfortunately, no value could be retrieved from `#{$name}`. "
+        + "Please make sure it is defined in `$breakpoints` map. "
+        + "Or pass the media query as a second parameter to add it to the map.";
+    }
+}
+/*
+element {
+    // `tiny` doesn't exist yet, better create it
+    @include respond-to(tiny, '(min-width: 500px)') {
+        color: red;
+    }
+}
+
+other-element {
+    // `tiny` now exists, use it normally
+    @include respond-to(tiny) {
+        clear: both;
+    }
+}
+
+complex-element {
+    // calling a complex media query
+    @include respond-to(complex) {
+        clear: both;
+    }
+}
+
+super-complex-element {
+    // calling a more complex media query
+    @include respond-to(super-complex) {
+        clear: both;
+    }
+}
+*/
